@@ -13,7 +13,7 @@ This research is being conducted under the patient supervision of
 Python3
 
 ```
-sudo apt-get install python3-pip -y
+sudo apt-get install python3-pip python3-tk -y
 ```
 
 Flask and requests
