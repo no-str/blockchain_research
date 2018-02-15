@@ -7,7 +7,6 @@ from uuid import uuid4
 import requests
 from flask import Flask, jsonify, request
 
-
 class Blockchain:
     def __init__(self):
         self.current_transactions = []
@@ -196,6 +195,7 @@ app = Flask(__name__)
 
 # Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
+print("Unique node identifier is: " + node_identifier + ".")
 
 # Instantiate the Blockchain
 blockchain = Blockchain()
