@@ -6,7 +6,8 @@ import subprocess
 def start_node():
     print("Starting Node @ IP " + ip.get() + " on Port " + str(port.get())
                     + ".")
-
+    node_add = 'python3 blockchain.py -p ' + str(port.get())
+    subprocess.Popen(node_add, shell=True)
 
 root = Tk()
 root.title("Node Creator")
