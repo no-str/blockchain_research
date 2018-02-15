@@ -194,8 +194,8 @@ class Blockchain:
 app = Flask(__name__)
 
 # Generate a globally unique address for this node
-node_identifier = str(uuid4()).replace('-', '')
-print("Unique node identifier is: " + node_identifier)
+#node_identifier = str(uuid4()).replace('-', '')
+#print("Unique node identifier is: " + node_identifier)
 
 # Instantiate the Blockchain
 blockchain = Blockchain()
@@ -211,7 +211,7 @@ def mine():
     # The sender is "0" to signify that this node has mined a new coin.
     #
     # No need for reward for finding proof, commented out to remove from block.
-    # Note that the amount variable is no longer defined.
+    # Note that the 'amount' variable is no longer defined.
     #
     # blockchain.new_transaction(
     #    sender="0",
