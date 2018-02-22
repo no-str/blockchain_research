@@ -19,4 +19,9 @@ url = 'http://159.89.89.46:5000/nodes/register'
 headers = {'Content-Type': 'application/json'}
 
 response = requests.post(url, headers=headers, json=transaction)
+
+reply = response.json()
+
+print('Node registration received.\n'+ reply['message'])
+
 print(response)
