@@ -18,4 +18,7 @@ url = ('http://' + recip + ':' + str(port) + '/transactions/new')
 headers = {'Content-Type': 'application/json'}
 
 response = requests.post(url, headers=headers, json=transaction)
-print(response)
+
+reply = response.json()
+
+print('Transaction received.\n'+ reply['message'])
