@@ -23,5 +23,3 @@ response = requests.post(url, headers=headers, json=transaction)
 reply = response.json()
 
 print('Node registration received.\n'+ reply['message'])
-
-print(response)
