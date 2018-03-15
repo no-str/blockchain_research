@@ -7,6 +7,10 @@ from uuid import uuid4
 import requests
 from flask import Flask, jsonify, request
 
+import pickle
+
+
+
 class Blockchain:
     def __init__(self):
         self.current_transactions = []
@@ -113,6 +117,10 @@ class Blockchain:
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
         }
 
+        # Write the new block to the .bin file containing the chain.
+        with open('block_chain.bin', 'wb') as file:
+            file.write(pickle.dumps(block))
+
         # Reset the current list of transactions
         self.current_transactions = []
 
@@ -194,12 +202,26 @@ class Blockchain:
 app = Flask(__name__)
 
 # Generate a globally unique address for this node
-#node_identifier = str(uuid4()).replace('-', '')
-#print("Unique node identifier is: " + node_identifier)
+# node_identifier = str(uuid4()).replace('-', '')
+# print("Unique node identifier is: " + node_identifier)
 
 # Instantiate the Blockchain
 blockchain = Blockchain()
 
+
+@app.route('/last', methods=['GET'])
+def last():
+    last_block = blockchain.last_block
+
+    response = {
+        'message': "The last block mined is below:",
+        'index': last_block['index'],
+        'transactions': last_block['transactions'],
+        'proof': last_block['proof'],
+        'previous_hash': last_block['previous_hash'],
+    }
+
+    return jsonify(response), 200
 
 @app.route('/mine', methods=['GET'])
 def mine():
@@ -207,11 +229,11 @@ def mine():
     last_block = blockchain.last_block
     proof = blockchain.proof_of_work(last_block)
 
-    # We must receive a reward for finding the proof.
-    # The sender is "0" to signify that this node has mined a new coin.
-    #
     # No need for reward for finding proof, commented out to remove from block.
     # Note that the 'amount' variable is no longer defined.
+    #
+    # We must receive a reward for finding the proof.
+    # The sender is "0" to signify that this node has mined a new coin.
     #
     # blockchain.new_transaction(
     #    sender="0",
@@ -230,6 +252,7 @@ def mine():
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
     }
+
     return jsonify(response), 200
 
 
