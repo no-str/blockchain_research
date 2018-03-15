@@ -23,7 +23,8 @@ def new_bin(self):
     return randint(range_start, range_end)
 
 #Generate a random bin number.
-bin_num = new_bin(self)
+bin_num = new_bin(4)
+print('Bin number ' + str(bin_num) + ' created.\n')
 
 transaction = {"sender": "Scott", "recipient": "Digi Node",
          "bin_num": str(bin_num)}
