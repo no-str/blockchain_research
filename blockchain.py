@@ -9,8 +9,6 @@ from flask import Flask, jsonify, request
 
 import pickle
 
-
-
 class Blockchain:
     def __init__(self):
         self.current_transactions = []
@@ -35,6 +33,17 @@ class Blockchain:
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
+
+    def stored_block(self):
+        """
+        Reads the last block saved to the blockchain file.
+        """
+        read_block = {}
+
+        with open('block_chain.pkl', 'rb') as file:
+            read_block = pickle.load(file)
+
+        return read_block
 
 
     def valid_chain(self, chain):
@@ -102,10 +111,11 @@ class Blockchain:
 
     def new_block(self, proof, previous_hash):
         """
-        Create a new Block in the Blockchain
+        Create a new Block in the Blockchain and write it to file.
 
         :param proof: The proof given by the Proof of Work algorithm
         :param previous_hash: Hash of previous Block
+        :file: block_chain.pkl is a pickle file containing the blockchain.
         :return: New Block
         """
 
@@ -117,9 +127,10 @@ class Blockchain:
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
         }
 
-        # Write the new block to the .bin file containing the chain.
-        with open('block_chain.bin', 'wb') as file:
+        # Write the new block to the pickle file containing the chain.
+        with open('block_chain.pkl', 'ab') as file:
             file.write(pickle.dumps(block))
+            file.close()
 
         # Reset the current list of transactions
         self.current_transactions = []
@@ -209,6 +220,20 @@ app = Flask(__name__)
 blockchain = Blockchain()
 
 
+@app.route('/read', methods=['GET'])
+def read():
+    response = blockchain.stored_block
+
+    # response = {
+    #    'message': "The last block mined is below:",
+    #     'index': read_block['index'],
+    #    'transactions': read_block['transactions'],
+    #    'proof': read_block['proof'],
+    #    'previous_hash': read_block['previous_hash'],
+    # }
+
+    return jsonify(response), 200
+
 @app.route('/last', methods=['GET'])
 def last():
     last_block = blockchain.last_block
@@ -229,17 +254,6 @@ def mine():
     last_block = blockchain.last_block
     proof = blockchain.proof_of_work(last_block)
 
-    # No need for reward for finding proof, commented out to remove from block.
-    # Note that the 'amount' variable is no longer defined.
-    #
-    # We must receive a reward for finding the proof.
-    # The sender is "0" to signify that this node has mined a new coin.
-    #
-    # blockchain.new_transaction(
-    #    sender="0",
-    #    recipient=node_identifier,
-    #    amount=1,
-    #)
 
     # Forge the new Block by adding it to the chain
     previous_hash = blockchain.hash(last_block)
