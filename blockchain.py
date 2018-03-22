@@ -9,12 +9,19 @@ from flask import Flask, jsonify, request
 
 import pickle
 
+import os.path
+
 class Blockchain:
     def __init__(self):
         self.current_transactions = []
         self.chain = []
         self.nodes = set()
 
+        # Check to see if there is a locally stored blockchain
+        # if os.path.isfile('block_chain.pkl'):
+        #    self.read_file()
+        #    self.chain = local_chain
+        #else:
         # Create the genesis block
         self.new_block(previous_hash='1', proof=100)
 
@@ -33,6 +40,19 @@ class Blockchain:
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
+
+#        def read_file(self):
+#
+#        local_chain = {}
+#        local_index = 0
+#
+#        f = open('block_chain.pkl', 'rb')
+#
+#        if pickle.load(f):
+#            local_chain = pickle.load(f)
+#
+#        else:
+#            print('End of file read.')
 
     def stored_block(self):
         """
@@ -127,16 +147,22 @@ class Blockchain:
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
         }
 
-        # Write the new block to the pickle file containing the chain.
-        with open('block_chain.pkl', 'ab') as file:
-            file.write(pickle.dumps(block))
-            file.close()
+        # Add the new block to the chain
+        self.chain.append(block)
+
+        # Write the new block to the pickle file containing the chain
+        self.write_file(block)
 
         # Reset the current list of transactions
         self.current_transactions = []
 
-        self.chain.append(block)
         return block
+
+    def write_file(self, block):
+            with open('block_chain.pkl', 'ab') as file:
+                file.write(pickle.dumps(block))
+                file.close()
+
 
     def new_transaction(self, sender, recipient, bin_num):
         """
@@ -208,7 +234,6 @@ class Blockchain:
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
 
-
 # Instantiate the Node
 app = Flask(__name__)
 
@@ -218,7 +243,6 @@ app = Flask(__name__)
 
 # Instantiate the Blockchain
 blockchain = Blockchain()
-
 
 @app.route('/read', methods=['GET'])
 def read():
@@ -269,7 +293,6 @@ def mine():
 
     return jsonify(response), 200
 
-
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
@@ -285,7 +308,6 @@ def new_transaction():
     response = {'message': f'Transaction will be added to Block {index}.'}
     return jsonify(response), 201
 
-
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
@@ -293,7 +315,6 @@ def full_chain():
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
-
 
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
@@ -312,7 +333,6 @@ def register_nodes():
     }
     return jsonify(response), 201
 
-
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
@@ -329,7 +349,6 @@ def consensus():
         }
 
     return jsonify(response), 200
-
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
