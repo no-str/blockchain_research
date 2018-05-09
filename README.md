@@ -70,7 +70,7 @@ python3 mine.py -i "ip_address" -p "port_number"
 For example, mining a block on your local node on port 5010:
 
 ```
-python3 mine.py -r 127.0.0.1 -p 5010
+python3 mine.py -i 127.0.0.1 -p 5010
 ```
 
 ### Authors
